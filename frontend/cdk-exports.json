@@ -1,0 +1,8 @@
+{
+  "BonAppetitBackendStack": {
+    "bonappetitapiendpoint": "https://t6muvvpwdzehpejmkkhya23tme.appsync-api.us-east-1.amazonaws.com/graphql",
+    "projectregion": "us-east-1",
+    "userpoolid": "us-east-1_CCzzINuiA",
+    "userpoolclientid": "2m2c218c3908rukd7c8sa43kbd"
+  }
+}

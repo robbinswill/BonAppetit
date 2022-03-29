@@ -1,16 +1,14 @@
-import { Stack, StackProps } from 'aws-cdk-lib';
-import { Construct } from 'constructs';
-// import * as sqs from 'aws-cdk-lib/aws-sqs';
+import * as cdk from '@aws-cdk/core';
+import * as cognito from '@aws-cdk/aws-cognito';
+import * as api from '@aws-cdk/aws-appsync';
+import * as lambda from '@aws-cdk/aws-lambda';
+import * as ddb from '@aws-cdk/aws-dynamodb';
 
-export class InfrastructureStack extends Stack {
-  constructor(scope: Construct, id: string, props?: StackProps) {
+
+export class InfrastructureStack extends cdk.Stack {
+  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // The code that defines your stack goes here
-
-    // example resource
-    // const queue = new sqs.Queue(this, 'InfrastructureQueue', {
-    //   visibilityTimeout: cdk.Duration.seconds(300)
-    // });
+    
   }
 }

@@ -1,0 +1,20 @@
+type recipeURL @aws_api_key @aws_cognito_user_pools {
+  id: ID!
+  url: String!
+  owner: String!
+}
+
+input recipeURLInput {
+  id: ID
+  url: String!
+}
+
+type Mutation {
+  createRecipeURL(recipeURL: recipeURLInput!): recipeURL!
+    @aws_cognito_user_pools
+}
+
+type Query {
+  listRecipeURLs: [recipeURL]!
+    @aws_api_key @aws_cognito_user_pools
+}
