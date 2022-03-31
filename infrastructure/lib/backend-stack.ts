@@ -57,7 +57,7 @@ export class BackendStack extends cdk.Stack {
     })
 
     const urlLambda = new lambda.Function(this, "appsync-url-handler", {
-      runtime: lambda.Runtime.NODEJS_14_X,
+      runtime: lambda.Runtime.NODEJS_12_X,
       handler: 'url.handler',
       code: lambda.Code.fromAsset('lambda-functions'),
       memorySize: 1024

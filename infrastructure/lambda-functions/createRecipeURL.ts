@@ -1,22 +1,18 @@
 const AWS = require('aws-sdk')
 const docClient = new AWS.DynamoDB.DocumentClient()
-import RecipeURL from "./RecipeURL"
 import { v4 as uuid } from 'uuid'
 
 
-async function createRecipeURL(request: RecipeURL, username: string) {
+async function createRecipeURL(inputUrl: string, username: string) {
 
-  if (!request.id) {
-    request.id = uuid()
-  }
-  const recipeData = { ...request, owner: username }
+  const recipeData = { id: uuid(), url: inputUrl, owner: username }
   const params = {
     TableName: process.env.URL_TABLE,
     Item: recipeData
   }
   try {
     await docClient.put(params).promise()
-    return request
+    return recipeData
   } catch (err) {
     console.log("DynamoDB error: ", err)
     return null

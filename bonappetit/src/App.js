@@ -1,12 +1,30 @@
 import logo from './logo.svg';
 import './App.css';
+import { v4 as uuid } from 'uuid';
 
 import React, { useState, useEffect } from 'react';
 import { AmplifyAuthenticator, AmplifySignUp } from '@aws-amplify/ui-react';
-import { Auth, Hub } from 'aws-amplify';
+import { Auth, Hub, API, graphqlOperation } from 'aws-amplify';
+import { createRecipeURL } from './graphql';
+
+
+const initialState = {inputUrl: ''}
 
 
 function App() {
+
+  const [newUrl, setNewUrl] = useState(initialState);
+  const { inputUrl } = newUrl
+
+  async function newRecipeURL() {
+    if (!inputUrl) {
+      return
+    }
+
+    await API.graphql(graphqlOperation(createRecipeURL, newUrl))
+    
+    setNewUrl(initialState)
+  }
 
   const [user, updateUser] = useState(null)
 
@@ -24,24 +42,18 @@ function App() {
       }
     })
   }, [])
-
+ 
   if (user) {
     return (
       <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+        <h1>Submit a recipe URL here:</h1>
+        <input
+          onChange={e => setNewUrl({ ...newUrl, 'inputUrl': e.target.value })}
+          name="inputUrl"
+          placeholder="Recipe URL"
+          value={newUrl.inputUrl}
+        />
+        <button onClick={newRecipeURL}>Submit recipe URL</button>
       </div>
     );
   }
