@@ -3,6 +3,7 @@ import * as cognito from '@aws-cdk/aws-cognito';
 import * as appsync from '@aws-cdk/aws-appsync';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ddb from '@aws-cdk/aws-dynamodb';
+import { DynamoEventSource } from '@aws-cdk/aws-lambda-event-sources';
 import { AuthorizationType, FieldLogLevel, Schema, UserPoolDefaultAction } from '@aws-cdk/aws-appsync';
 
 
@@ -48,7 +49,15 @@ export class BackendStack extends cdk.Stack {
       }
     })
 
-    const urlTable = new ddb.Table(this, "bonappetit-table", {
+    const urlTable = new ddb.Table(this, "bonappetit-url-table", {
+      billingMode: ddb.BillingMode.PAY_PER_REQUEST,
+      partitionKey: {
+        name: 'id',
+        type: ddb.AttributeType.STRING
+      }
+    })
+
+    const recipeTable = new ddb.Table(this, "bonappetit-recipe-table", {
       billingMode: ddb.BillingMode.PAY_PER_REQUEST,
       partitionKey: {
         name: 'id',
@@ -59,6 +68,13 @@ export class BackendStack extends cdk.Stack {
     const urlLambda = new lambda.Function(this, "appsync-url-handler", {
       runtime: lambda.Runtime.NODEJS_12_X,
       handler: 'url.handler',
+      code: lambda.Code.fromAsset('lambda-functions'),
+      memorySize: 1024
+    })
+
+    const recipeLambda = new lambda.Function(this, "recipe-logic", {
+      runtime: lambda.Runtime.PYTHON_3_8,
+      handler: 'logic.handler',
       code: lambda.Code.fromAsset('lambda-functions'),
       memorySize: 1024
     })
@@ -77,6 +93,14 @@ export class BackendStack extends cdk.Stack {
 
     urlTable.grantFullAccess(urlLambda)
     urlLambda.addEnvironment("URL_TABLE", urlTable.tableName)
+
+    recipeTable.grantFullAccess(recipeLambda)
+    recipeLambda.addEnvironment("URL_TABLE", urlTable.tableName)
+    recipeLambda.addEnvironment("RECIPE_TABLE", recipeTable.tableName)
+
+    recipeLambda.addEventSource(new DynamoEventSource(urlTable, {
+      startingPosition: lambda.StartingPosition.LATEST
+    }))
 
     new cdk.CfnOutput(this, "user-pool-id", {
       value: userPool.userPoolId

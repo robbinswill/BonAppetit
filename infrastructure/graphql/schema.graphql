@@ -4,12 +4,22 @@ type recipeURL @aws_cognito_user_pools {
   owner: String!
 }
 
+type recipeCard @aws_cognito_user_pools {
+  id: ID!
+  ingredients: [String]!
+  instructions: String!
+}
+
 type Mutation {
   createRecipeURL(inputUrl: String!): recipeURL!
+    @aws_cognito_user_pools
+  createRecipeCard(newIngredients: String!, newInstructions: String!): recipeCard!
     @aws_cognito_user_pools
 }
 
 type Query {
   listRecipeURLs: [recipeURL]!
+    @aws_cognito_user_pools
+  listRecipeCards: [recipeCard]!
     @aws_cognito_user_pools
 }
