@@ -107,7 +107,7 @@ export class InfrastructureStack extends cdk.Stack {
               'pwd',
               'ls -al',
               'env',
-              'export TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}'
+              'export TAG=${CODEBUILD_SOURCE_VERSION}'
             ]
           },
           build: {
