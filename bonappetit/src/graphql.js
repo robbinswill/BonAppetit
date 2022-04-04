@@ -1,11 +1,34 @@
-export const createRecipeURL = /* GraphQL */ `
-  mutation CreateRecipeURL(
+export const createRecipe = /* GraphQL */ `
+  mutation CreateRecipe(
     $inputUrl: String!
   ) {
-    createRecipeURL(inputUrl: $inputUrl) {
+    createRecipe(inputUrl: $inputUrl) {
       id
       url
       owner
+      title
+      ingredients
+      instructions
+    }
+  }
+`
+
+export const listRecipes = /* GraphQL */ `
+  query ListRecipes {
+    listRecipes {
+      title
+      ingredients
+      instructions
+    }
+  }
+`
+
+export const onCreateRecipe = /* GraphQL */ `
+  subscription OnCreateRecipe {
+    onCreateRecipe {
+      title
+      ingredients
+      instructions
     }
   }
 `

@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import React, { useState, useEffect } from 'react';
 import { AmplifyAuthenticator, AmplifySignUp } from '@aws-amplify/ui-react';
 import { Auth, Hub, API, graphqlOperation } from 'aws-amplify';
-import { createRecipeURL } from './graphql';
+import { createRecipe, listRecipes } from './graphql';
 
 
 const initialState = {inputUrl: ''}
@@ -21,9 +21,18 @@ function App() {
       return
     }
 
-    await API.graphql(graphqlOperation(createRecipeURL, newUrl))
+    console.log(newUrl)
+
+    await API.graphql(graphqlOperation(createRecipe, newUrl))
     
     setNewUrl(initialState)
+  }
+
+  const [recipes, setRecipes] = useState([])
+
+  async function fetchRecipes() {
+    const recipeData = await API.graphql(graphqlOperation(listRecipes))
+    setRecipes(recipeData.data.listRecipes)
   }
 
   const [user, updateUser] = useState(null)
@@ -41,6 +50,8 @@ function App() {
           return updateUser(null);
       }
     })
+
+    fetchRecipes()
   }, [])
  
   if (user) {
@@ -54,6 +65,16 @@ function App() {
           value={newUrl.inputUrl}
         />
         <button onClick={newRecipeURL}>Submit recipe URL</button>
+        <h1>Recipe card:</h1>
+        {
+          recipes.map((recipe) => (
+            <div>
+            <h2>{recipe.title}</h2>
+            <h3>{recipe.ingredients}</h3>
+            <h3>{recipe.instructions}</h3>
+            </div>
+          ))
+        }
       </div>
     );
   }
