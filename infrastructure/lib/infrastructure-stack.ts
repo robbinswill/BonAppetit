@@ -100,7 +100,7 @@ export class InfrastructureStack extends cdk.Stack {
         }
       },
       buildSpec: codebuild.BuildSpec.fromObject({
-        version: "0.1",
+        version: "0.2",
         phases: {
           pre_build: {
             commands: [
