@@ -128,7 +128,7 @@ export class InfrastructureStack extends cdk.Stack {
               'pwd',
               'ls -al',
               'echo "In post-build stage"',
-              "printf '[{\"name\":\"recipe-app\",\"imageUri\":\"%s\"}]' $ECR_REPO_URI:$TAG > imagedefinitions.json",
+              "printf '[{\"name\":\"BonAppetit\",\"imageUri\":\"%s\"}]' $ECR_REPO_URI:$TAG > imagedefinitions.json",
               "pwd; ls -al; cat imagedefinitions.json"
             ]
           }
