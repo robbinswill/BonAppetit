@@ -5,6 +5,9 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as ddb from '@aws-cdk/aws-dynamodb';
 import { DynamoEventSource } from '@aws-cdk/aws-lambda-event-sources';
 import { AuthorizationType, FieldLogLevel, Schema, UserPoolDefaultAction } from '@aws-cdk/aws-appsync';
+import { StreamViewType } from '@aws-cdk/aws-dynamodb';
+import { RemovalPolicy } from '@aws-cdk/core';
+import { LayerVersion } from '@aws-cdk/aws-lambda';
 
 
 export class BackendStack extends cdk.Stack {
@@ -50,33 +53,47 @@ export class BackendStack extends cdk.Stack {
     })
 
     const urlTable = new ddb.Table(this, "bonappetit-url-table", {
+      tableName: "dynamodb-url-table",
       billingMode: ddb.BillingMode.PAY_PER_REQUEST,
       partitionKey: {
         name: 'id',
         type: ddb.AttributeType.STRING
-      }
+      },
+      stream: StreamViewType.NEW_AND_OLD_IMAGES,
+      removalPolicy: RemovalPolicy.DESTROY
     })
 
     const recipeTable = new ddb.Table(this, "bonappetit-recipe-table", {
+      tableName: "dynamodb-recipe-table",
       billingMode: ddb.BillingMode.PAY_PER_REQUEST,
       partitionKey: {
         name: 'id',
         type: ddb.AttributeType.STRING
-      }
+      },
+      removalPolicy: RemovalPolicy.DESTROY
     })
 
     const urlLambda = new lambda.Function(this, "appsync-url-handler", {
       runtime: lambda.Runtime.NODEJS_12_X,
       handler: 'url.handler',
-      code: lambda.Code.fromAsset('lambda-functions'),
+      code: lambda.Code.fromAsset('lambda-ts'),
       memorySize: 1024
+    })
+
+    const boto3LambdaLayer = new LayerVersion(this, "boto3-layer", {
+      compatibleRuntimes: [
+        lambda.Runtime.PYTHON_3_8
+      ],
+      code: lambda.Code.fromAsset('lambda-py/boto3-layer'),
+      description: "boto3 layer for logic.py lambda"
     })
 
     const recipeLambda = new lambda.Function(this, "recipe-logic", {
       runtime: lambda.Runtime.PYTHON_3_8,
       handler: 'logic.handler',
-      code: lambda.Code.fromAsset('lambda-functions'),
-      memorySize: 1024
+      code: lambda.Code.fromAsset('lambda-py'),
+      memorySize: 1024,
+      layers: [boto3LambdaLayer]
     })
 
     const urlLambdaDataSource = api.addLambdaDataSource("lambda-url-datasource", urlLambda)
