@@ -1,7 +1,4 @@
-import logo from './logo.svg';
 import './App.css';
-import { v4 as uuid } from 'uuid';
-
 import React, { useState, useEffect } from 'react';
 import { AmplifyAuthenticator, AmplifySignUp } from '@aws-amplify/ui-react';
 import { Auth, Hub, API, graphqlOperation } from 'aws-amplify';
