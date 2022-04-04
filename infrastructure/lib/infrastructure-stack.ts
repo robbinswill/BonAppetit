@@ -107,7 +107,7 @@ export class InfrastructureStack extends cdk.Stack {
               'pwd',
               'ls -al',
               'env',
-              'export TAG=${CODEBUILD_SOURCE_VERSION}'
+              'export TAG=${CODEBUILD_RESOLVED_SOURCE_VERSION}'
             ]
           },
           build: {
@@ -115,7 +115,7 @@ export class InfrastructureStack extends cdk.Stack {
               'pwd',
               'ls -al',
               'cd bonappetit',
-              `docker build -t $ECR_REPO_URI:$TAG .`,
+              'docker build -t $ECR_REPO_URI:$TAG .',
               '$(aws ecr get-login --no-include-email)',
               'docker push $ECR_REPO_URI:$TAG'
             ]
