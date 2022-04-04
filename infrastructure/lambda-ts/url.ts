@@ -1,5 +1,5 @@
-import createRecipeURL from "./createRecipeURL";
-import listRecipeURLs from "./listRecipeURLs";
+import createRecipe from "./createRecipe";
+import listRecipes from "./listRecipes";
 
 
 type AppSyncEvent = {
@@ -17,11 +17,11 @@ type AppSyncEvent = {
 
 exports.handler = async (event: AppSyncEvent) => {
   switch (event.info.fieldName) {
-    case "createRecipeURL":
+    case "createRecipe":
       const { username } = event.identity
-      return await createRecipeURL(event.arguments.inputUrl, username)
-    case "listRecipeURLs":
-      return await listRecipeURLs()
+      return await createRecipe(event.arguments.inputUrl, username)
+    case "listRecipes":
+      return await listRecipes()
     default:
       return null
   }

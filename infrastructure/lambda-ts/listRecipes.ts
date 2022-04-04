@@ -2,7 +2,7 @@ const AWS = require('aws-sdk')
 const docClient = new AWS.DynamoDB.DocumentClient()
 
 
-async function listRecipeURLs() {
+async function listRecipes() {
   const params = {
     TableName: process.env.URL_TABLE
   }
@@ -15,4 +15,4 @@ async function listRecipeURLs() {
   }
 }
 
-export default listRecipeURLs
+export default listRecipes

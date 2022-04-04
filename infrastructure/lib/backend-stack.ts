@@ -63,15 +63,15 @@ export class BackendStack extends cdk.Stack {
       removalPolicy: RemovalPolicy.DESTROY
     })
 
-    const recipeTable = new ddb.Table(this, "bonappetit-recipe-table", {
-      tableName: "dynamodb-recipe-table",
-      billingMode: ddb.BillingMode.PAY_PER_REQUEST,
-      partitionKey: {
-        name: 'id',
-        type: ddb.AttributeType.STRING
-      },
-      removalPolicy: RemovalPolicy.DESTROY
-    })
+    // const recipeTable = new ddb.Table(this, "bonappetit-recipe-table", {
+    //   tableName: "dynamodb-recipe-table",
+    //   billingMode: ddb.BillingMode.PAY_PER_REQUEST,
+    //   partitionKey: {
+    //     name: 'id',
+    //     type: ddb.AttributeType.STRING
+    //   },
+    //   removalPolicy: RemovalPolicy.DESTROY
+    // })
 
     const urlLambda = new lambda.Function(this, "appsync-url-handler", {
       runtime: lambda.Runtime.NODEJS_12_X,
@@ -80,12 +80,20 @@ export class BackendStack extends cdk.Stack {
       memorySize: 1024
     })
 
-    const boto3LambdaLayer = new LayerVersion(this, "boto3-layer", {
+    const boto3Layer = new LayerVersion(this, "boto3-layer", {
       compatibleRuntimes: [
         lambda.Runtime.PYTHON_3_8
       ],
       code: lambda.Code.fromAsset('lambda-py/boto3-layer'),
-      description: "boto3 layer for logic.py lambda"
+      description: "layer containing boto3 package"
+    })
+
+    const recipeScraperLayer = new LayerVersion(this, "scraper-layer", {
+      compatibleRuntimes: [
+        lambda.Runtime.PYTHON_3_8
+      ],
+      code: lambda.Code.fromAsset('lambda-py/scraper-layer'),
+      description: "layer containing recipe-scraper package"
     })
 
     const recipeLambda = new lambda.Function(this, "recipe-logic", {
@@ -93,27 +101,28 @@ export class BackendStack extends cdk.Stack {
       handler: 'logic.handler',
       code: lambda.Code.fromAsset('lambda-py'),
       memorySize: 1024,
-      layers: [boto3LambdaLayer]
+      layers: [boto3Layer, recipeScraperLayer]
     })
 
     const urlLambdaDataSource = api.addLambdaDataSource("lambda-url-datasource", urlLambda)
 
     urlLambdaDataSource.createResolver({
       typeName: "Mutation",
-      fieldName: "createRecipeURL"
+      fieldName: "createRecipe"
     })
 
     urlLambdaDataSource.createResolver({
       typeName: "Query",
-      fieldName: "listRecipeURLs"
+      fieldName: "listRecipes"
     })
 
     urlTable.grantFullAccess(urlLambda)
+    urlTable.grantFullAccess(recipeLambda)
     urlLambda.addEnvironment("URL_TABLE", urlTable.tableName)
 
-    recipeTable.grantFullAccess(recipeLambda)
+    // recipeTable.grantFullAccess(recipeLambda)
     recipeLambda.addEnvironment("URL_TABLE", urlTable.tableName)
-    recipeLambda.addEnvironment("RECIPE_TABLE", recipeTable.tableName)
+    // recipeLambda.addEnvironment("RECIPE_TABLE", recipeTable.tableName)
 
     recipeLambda.addEventSource(new DynamoEventSource(urlTable, {
       startingPosition: lambda.StartingPosition.LATEST
