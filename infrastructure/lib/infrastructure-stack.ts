@@ -26,8 +26,8 @@ export class InfrastructureStack extends cdk.Stack {
       vpc: vpc
     })
 
-    const taskRole = new iam.Role(this, 'BonAppetit-TaskRole', {
-      roleName: 'BonAppetit-TaskRole',
+    const taskRole = new iam.Role(this, `ecs-taskRole-${this.stackName}`, {
+      roleName: `ecs-taskRole-${this.stackName}`,
       assumedBy: new iam.ServicePrincipal('ecs-tasks.amazonaws.com')
     })
 
@@ -49,6 +49,7 @@ export class InfrastructureStack extends cdk.Stack {
     })
     taskDef.addToExecutionRolePolicy(executionRolePolicy)
 
+    // THIS HAS TO BE THE SAME NAME AS THE NAME IN imagedefinition.json
     const container = taskDef.addContainer('BonAppetit-App', {
       image: ecs.ContainerImage.fromRegistry("hello-world"),
       memoryLimitMiB: 256,
@@ -128,7 +129,7 @@ export class InfrastructureStack extends cdk.Stack {
               'pwd',
               'ls -al',
               'echo "In post-build stage"',
-              "printf '[{\"name\":\"BonAppetit\",\"imageUri\":\"%s\"}]' $ECR_REPO_URI:$TAG > imagedefinitions.json",
+              "printf '[{\"name\":\"BonAppetit-App\",\"imageUri\":\"%s\"}]' $ECR_REPO_URI:$TAG > imagedefinitions.json",
               "pwd; ls -al; cat imagedefinitions.json"
             ]
           }
