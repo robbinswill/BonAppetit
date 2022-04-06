@@ -1,6 +1,6 @@
 import './App.css';
 import React, { useState, useEffect } from 'react';
-import { AmplifyAuthenticator, AmplifySignUp } from '@aws-amplify/ui-react';
+import { AmplifyAuthenticator, AmplifySignUp, AmplifySignOut } from '@aws-amplify/ui-react';
 import { Auth, Hub, API, graphqlOperation } from 'aws-amplify';
 import { createRecipe, listRecipes } from './graphql';
 
@@ -54,6 +54,7 @@ function App() {
   if (user) {
     return (
       <div className="App">
+        <AmplifySignOut />
         <h1>Submit a recipe URL here:</h1>
         <input
           onChange={e => setNewUrl({ ...newUrl, 'inputUrl': e.target.value })}

@@ -55,7 +55,7 @@ export class InfrastructureStack extends cdk.Stack {
       memoryLimitMiB: 256,
       cpu: 256
     }).addPortMappings({
-      containerPort: 3000,
+      containerPort: 80,
       protocol: ecs.Protocol.TCP
     })
 
@@ -67,9 +67,9 @@ export class InfrastructureStack extends cdk.Stack {
       listenerPort: 80
     })
 
-    const scaling = fargateService.service.autoScaleTaskCount({ maxCapacity: 5, minCapacity: 1 })
+    const scaling = fargateService.service.autoScaleTaskCount({ maxCapacity: 10, minCapacity: 3 })
     scaling.scaleOnCpuUtilization('cpu-scaling', {
-      targetUtilizationPercent: 50,
+      targetUtilizationPercent: 10,
       scaleInCooldown: cdk.Duration.seconds(60),
       scaleOutCooldown: cdk.Duration.seconds(60)
     })
