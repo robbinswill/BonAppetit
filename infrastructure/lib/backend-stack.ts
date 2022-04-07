@@ -63,16 +63,6 @@ export class BackendStack extends cdk.Stack {
       removalPolicy: RemovalPolicy.DESTROY
     })
 
-    // const recipeTable = new ddb.Table(this, "bonappetit-recipe-table", {
-    //   tableName: "dynamodb-recipe-table",
-    //   billingMode: ddb.BillingMode.PAY_PER_REQUEST,
-    //   partitionKey: {
-    //     name: 'id',
-    //     type: ddb.AttributeType.STRING
-    //   },
-    //   removalPolicy: RemovalPolicy.DESTROY
-    // })
-
     const urlLambda = new lambda.Function(this, "appsync-url-handler", {
       runtime: lambda.Runtime.NODEJS_12_X,
       handler: 'url.handler',
@@ -119,10 +109,7 @@ export class BackendStack extends cdk.Stack {
     urlTable.grantFullAccess(urlLambda)
     urlTable.grantFullAccess(recipeLambda)
     urlLambda.addEnvironment("URL_TABLE", urlTable.tableName)
-
-    // recipeTable.grantFullAccess(recipeLambda)
     recipeLambda.addEnvironment("URL_TABLE", urlTable.tableName)
-    // recipeLambda.addEnvironment("RECIPE_TABLE", recipeTable.tableName)
 
     recipeLambda.addEventSource(new DynamoEventSource(urlTable, {
       startingPosition: lambda.StartingPosition.LATEST

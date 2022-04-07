@@ -17,11 +17,13 @@ type AppSyncEvent = {
 
 exports.handler = async (event: AppSyncEvent) => {
   switch (event.info.fieldName) {
-    case "createRecipe":
+    case "createRecipe": {
       const { username } = event.identity
       return await createRecipe(event.arguments.inputUrl, username)
-    case "listRecipes":
+    }
+    case "listRecipes": {
       return await listRecipes()
+    }
     default:
       return null
   }

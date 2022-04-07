@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk')
-const docClient = new AWS.DynamoDB.DocumentClient()
+const database = new AWS.DynamoDB.DocumentClient()
 import { v4 as uuid } from 'uuid'
 
 
@@ -10,12 +10,14 @@ async function createRecipe(inputUrl: string, username: string) {
     TableName: process.env.URL_TABLE,
     Item: recipeData
   }
+
   try {
-    await docClient.put(params).promise()
+    await database.put(params).promise()
     return recipeData
   } catch (err) {
-    console.log("DynamoDB error: ", err)
-    return null
+      console.log("Error with DynamoDB:")
+      console.log(err)
+      return null
   }
 }
 
